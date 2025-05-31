@@ -6,6 +6,11 @@
     <title>The Link Tracker - Admin</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Override du container standard pour plus de largeur */
+        .container {
+            max-width: 1200px; /* Augmentation de la largeur par défaut */
+        }
+        
         /* Styles spécifiques à la page admin */
         .admin-header {
             display: flex;
@@ -17,11 +22,32 @@
         .creators-table {
             width: 100%;
             margin-top: 1rem;
+            table-layout: fixed;
         }
         
-        .creators-table th {
+        .creators-table th, .creators-table td {
             text-align: left;
             padding: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Définition des largeurs de colonnes */
+        .creators-table th:nth-child(1), .creators-table td:nth-child(1) { width: 10%; } /* Pseudo */
+        .creators-table th:nth-child(2), .creators-table td:nth-child(2) { width: 20%; } /* Lien */
+        .creators-table th:nth-child(3), .creators-table td:nth-child(3) { width: 10%; } /* Commission */
+        .creators-table th:nth-child(4), .creators-table td:nth-child(4) { width: 8%; } /* Clics */
+        .creators-table th:nth-child(5), .creators-table td:nth-child(5) { width: 12%; } /* Revenus */
+        .creators-table th:nth-child(6), .creators-table td:nth-child(6) { width: 12%; } /* Payé */
+        .creators-table th:nth-child(7), .creators-table td:nth-child(7) { width: 12%; } /* Reste à payer */
+        .creators-table th:nth-child(8), .creators-table td:nth-child(8) { width: 8%; } /* Actions */
+        
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+            margin: 0;
+            padding: 0;
         }
         
         .view-button {
@@ -43,6 +69,16 @@
             font-weight: bold;
             border-top: 2px solid #ddd;
             background: #f1f3f5;
+        }
+        
+        @media (max-width: 1200px) {
+            .table-container {
+                overflow-x: scroll;
+            }
+            
+            .creators-table {
+                min-width: 1000px;
+            }
         }
     </style>
 </head>
@@ -193,7 +229,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${creator.pseudo}</td>
-                    <td><a href="${creator.rebrandly_link}" target="_blank">${creator.rebrandly_link}</a></td>
+                    <td><a href="${creator.rebrandly_link}" target="_blank" title="${creator.rebrandly_link}">${creator.rebrandly_link}</a></td>
                     <td>${formatter.format(creator.click_rate)}</td>
                     <td>${creator.clicks.toLocaleString('fr-FR')}</td>
                     <td>${formatter.format(revenue)}</td>
