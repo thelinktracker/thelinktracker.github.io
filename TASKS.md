@@ -19,27 +19,27 @@
 - [ ] Tester avec un lien existant
 
 ### GitHub Pages : Setup initial
-- [ ] Créer repo `rebrandlytracker`
-- [ ] Configurer GitHub Pages
-- [ ] Créer structure `/docs`
-- [ ] Créer `README.md` initial
+- [x] Créer repo `rebrandlytracker`
+- [x] Configurer GitHub Pages
+- [x] Créer structure `/docs`
+- [x] Créer `README.md` initial
 
 ### Front-end MVP
-- [ ] Créer `dashboard.html` basique
-- [ ] Créer `style.css` minimal
-- [ ] Créer `app.js` avec :
-  - [ ] Lecture paramètre `ref`
-  - [ ] Appel API Supabase
-  - [ ] Affichage clics et revenu estimé
-  - [ ] Message d'erreur si pseudo inconnu
+- [x] Créer `dashboard.html` basique
+- [x] Créer `style.css` minimal
+- [x] Créer `app.js` avec :
+  - [x] Lecture paramètre `ref`
+  - [x] Appel API Supabase
+  - [x] Affichage clics et revenu estimé
+  - [x] Message d'erreur si pseudo inconnu
 
 ## 🟡 Priorité Moyenne
 
 ### UI Historique des paiements
-- [ ] Ajouter section historique dans `dashboard.html`
-- [ ] Appel API Supabase payments
-- [ ] Affichage tableau paiements
-- [ ] Tri par date
+- [x] Ajouter section historique dans `dashboard.html`
+- [x] Appel API Supabase payments
+- [x] Affichage tableau paiements
+- [x] Tri par date
 
 ### Make.com : Scénario Paiements
 - [ ] Créer scénario "Enregistrer Paiement"

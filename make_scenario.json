@@ -1,0 +1,62 @@
+{
+  "name": "Sync Rebrandly Stats",
+  "trigger": {
+    "type": "scheduler",
+    "frequency": "1 hour"
+  },
+  "steps": [
+    {
+      "name": "List Rebrandly Links",
+      "module": "Rebrandly",
+      "operation": "List links",
+      "parameters": {
+        "orderBy": "createdAt",
+        "orderDir": "desc",
+        "limit": 100
+      }
+    },
+    {
+      "name": "Iterator",
+      "type": "iterator",
+      "parameters": {
+        "collection": "{{1.links}}"
+      }
+    },
+    {
+      "name": "Get Link Clicks",
+      "module": "Rebrandly",
+      "operation": "Get link clicks",
+      "parameters": {
+        "id": "{{2.id}}"
+      }
+    },
+    {
+      "name": "Upsert Stats",
+      "module": "Supabase",
+      "operation": "Upsert record",
+      "parameters": {
+        "table": "affiliates_stats",
+        "match": ["pseudo"],
+        "data": {
+          "pseudo": "{{2.slashtag}}",
+          "rebrandly_link": "{{2.shortUrl}}",
+          "clicks": "{{3.clicks}}",
+          "estimated_revenue": "{{3.clicks * parseFloat(2.title)}}",
+          "updated_at": "now()"
+        }
+      },
+      "connection": {
+        "url": "https://hpjywzvwmtiikhntbbyt.supabase.co",
+        "headers": {
+          "apikey": "SUPABASE_SERVICE_KEY",
+          "Authorization": "Bearer SUPABASE_SERVICE_KEY"
+        }
+      }
+    }
+  ],
+  "notes": [
+    "Le tarif par clic est stocké dans le titre du lien Rebrandly",
+    "Le pseudo est stocké dans le slashtag du lien",
+    "Remplacer SUPABASE_SERVICE_KEY par la vraie clé de service"
+  ]
+} 

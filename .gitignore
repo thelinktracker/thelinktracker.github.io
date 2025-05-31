@@ -1,0 +1,14 @@
+# Fichiers de configuration et clés
+keys.txt
+.env
+*.env
+.env.*
+
+# Dépendances et builds
+node_modules/
+dist/
+build/
+
+# Fichiers système
+.DS_Store
+Thumbs.db 

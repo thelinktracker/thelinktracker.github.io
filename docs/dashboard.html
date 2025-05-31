@@ -11,20 +11,68 @@
         <div id="error" class="error hidden"></div>
         
         <div id="stats" class="stats hidden">
-            <h1>Vos statistiques</h1>
-            
-            <div class="stat-card">
-                <h2>Clics</h2>
-                <p id="clicks">-</p>
+            <div class="creator-info">
+                <div class="creator-header">
+                    <h1 id="creatorName">-</h1>
+                    <div class="link-info">
+                        <span class="label">Votre lien :</span>
+                        <div class="link-container">
+                            <code id="creatorLink">-</code>
+                            <button id="copyLink" class="copy-button">Copier</button>
+                        </div>
+                    </div>
+                    <div class="rate-info">
+                        <span class="label">Commission par clic :</span>
+                        <code id="clickRate">-</code>
+                    </div>
+                </div>
             </div>
 
-            <div class="stat-card">
-                <h2>Revenu estimé</h2>
-                <p id="revenue">-</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h2>Clics</h2>
+                    <p id="clicks">-</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>Revenu estimé</h2>
+                    <p id="revenue">-</p>
+                </div>
+
+                <div class="stat-card highlight">
+                    <h2>Reste à payer</h2>
+                    <p id="remaining">-</p>
+                    <small>Revenu total - Paiements effectués</small>
+                </div>
             </div>
 
             <div class="update-info">
                 <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+            </div>
+
+            <div class="payments-section">
+                <h2>Historique des paiements</h2>
+                <div class="table-container">
+                    <table id="payments">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Commentaire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rempli dynamiquement -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>Total payé</strong></td>
+                                <td id="totalPaid">-</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
