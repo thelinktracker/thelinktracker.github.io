@@ -6,7 +6,7 @@
 
 Chaque créateur a accès à son dashboard via un lien unique :
 ```
-https://harryjmg.github.io/rebrandlytracker/dashboard.html?ref=PSEUDO
+https://thelinktracker.github.io/dashboard.html?ref=PSEUDO
 ```
 
 Remplacez `PSEUDO` par l'identifiant du créateur.
@@ -41,5 +41,5 @@ Pour ajouter un nouveau créateur :
 
 Pour tester le dashboard, utilisez :
 ```
-https://harryjmg.github.io/rebrandlytracker/dashboard.html?ref=test
+https://thelinktracker.github.io/dashboard.html?ref=test
 ``` 

@@ -18,7 +18,7 @@
 
 Testez le dashboard avec notre créateur de test :
 ```
-https://harryjmg.github.io/rebrandlytracker/dashboard.html?ref=test
+https://thelinktracker.github.io/dashboard.html?ref=test
 ```
 
 ## 🔗 Stack technique
@@ -38,7 +38,7 @@ https://harryjmg.github.io/rebrandlytracker/dashboard.html?ref=test
    ```
 3. Communiquer le lien du dashboard au créateur :
    ```
-   https://harryjmg.github.io/rebrandlytracker/dashboard.html?ref=pseudo
+   https://thelinktracker.github.io/dashboard.html?ref=pseudo
    ```
 
 ## 📂 Structure du projet
