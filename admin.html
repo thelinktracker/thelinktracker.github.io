@@ -19,6 +19,82 @@
             margin-bottom: 2rem;
         }
         
+        .logout-button {
+            padding: 0.5rem 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .logout-button:hover {
+            background: #c0392b;
+        }
+        
+        /* Styles pour le formulaire d'ajout */
+        .add-creator-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .add-creator-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .add-button {
+            padding: 0.5rem 1rem;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .add-button:hover {
+            background: #00a383;
+        }
+        
+        .delete-button {
+            padding: 0.3rem 0.6rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+        
+        .delete-button:hover {
+            background: #c0392b;
+        }
+        
         .creators-table {
             width: 100%;
             margin-top: 1rem;
@@ -41,7 +117,7 @@
         .creators-table th:nth-child(5), .creators-table td:nth-child(5) { width: 12%; } /* Revenus */
         .creators-table th:nth-child(6), .creators-table td:nth-child(6) { width: 12%; } /* Payé */
         .creators-table th:nth-child(7), .creators-table td:nth-child(7) { width: 12%; } /* Reste à payer */
-        .creators-table th:nth-child(8), .creators-table td:nth-child(8) { width: 8%; } /* Actions */
+        .creators-table th:nth-child(8), .creators-table td:nth-child(8) { width: 16%; } /* Actions */
         
         .table-container {
             overflow-x: auto;
@@ -59,6 +135,7 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: background-color 0.2s;
+            margin-right: 0.5rem;
         }
         
         .view-button:hover {
@@ -69,6 +146,12 @@
             font-weight: bold;
             border-top: 2px solid #ddd;
             background: #f1f3f5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #636e72;
         }
         
         @media (max-width: 1200px) {
@@ -84,53 +167,86 @@
 </head>
 <body>
     <div class="container">
-        <div class="admin-header">
-            <h1>Dashboard Admin</h1>
-            <small>Vue d'ensemble de tous les créateurs</small>
-        </div>
+        <div class="loading" id="loading">Vérification de l'authentification...</div>
         
-        <div class="stats">
-            <div class="table-container">
-                <table id="creators" class="creators-table">
-                    <thead>
-                        <tr>
-                            <th>Pseudo</th>
-                            <th>Lien</th>
-                            <th>Commission/clic</th>
-                            <th>Clics</th>
-                            <th>Revenus</th>
-                            <th>Payé</th>
-                            <th>Reste à payer</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rempli dynamiquement -->
-                    </tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td colspan="4">Total</td>
-                            <td id="totalRevenue">-</td>
-                            <td id="totalPaid">-</td>
-                            <td id="totalRemaining">-</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+        <div id="adminContent" style="display: none;">
+            <div class="admin-header">
+                <h1>Dashboard Admin</h1>
+                <button class="logout-button" id="logoutBtn">Déconnexion</button>
             </div>
             
-            <div class="update-info">
-                <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+            <div class="add-creator-section">
+                <h2>Ajouter un créateur</h2>
+                <form id="addCreatorForm" class="add-creator-form">
+                    <div class="form-group">
+                        <label for="pseudo">Pseudo</label>
+                        <input type="text" id="pseudo" required placeholder="lucas">
+                    </div>
+                    <div class="form-group">
+                        <label for="link">Lien Rebrandly</label>
+                        <input type="url" id="link" required placeholder="https://rebrand.ly/lucas">
+                    </div>
+                    <div class="form-group">
+                        <label for="rate">Commission par clic (€)</label>
+                        <input type="number" id="rate" step="0.01" min="0" required placeholder="0.50">
+                    </div>
+                    <button type="submit" class="add-button">Ajouter</button>
+                </form>
+            </div>
+            
+            <div class="stats">
+                <div id="message"></div>
+                <div class="table-container">
+                    <table id="creators" class="creators-table">
+                        <thead>
+                            <tr>
+                                <th>Pseudo</th>
+                                <th>Lien</th>
+                                <th>Commission/clic</th>
+                                <th>Clics</th>
+                                <th>Revenus</th>
+                                <th>Payé</th>
+                                <th>Reste à payer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rempli dynamiquement -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="4">Total</td>
+                                <td id="totalRevenue">-</td>
+                                <td id="totalPaid">-</td>
+                                <td id="totalRemaining">-</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div class="update-info">
+                    <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+                </div>
             </div>
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
         // Configuration Supabase
         const SUPABASE_URL = 'https://hpjywzvwmtiikhntbbyt.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwanl3enZ3bXRpaWtobnRiYnl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI1OTIsImV4cCI6MjA2NDI3ODU5Mn0.rogNUkmTWdOpK-UuxTG9q3Hj-mj89UKtBnQtALNrtX4';
         
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         // Éléments DOM
+        const loadingDiv = document.getElementById('loading');
+        const adminContent = document.getElementById('adminContent');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addCreatorForm = document.getElementById('addCreatorForm');
+        const messageDiv = document.getElementById('message');
         const creatorsTableBody = document.querySelector('#creators tbody');
         const totalRevenueEl = document.getElementById('totalRevenue');
         const totalPaidEl = document.getElementById('totalPaid');
@@ -144,37 +260,103 @@
         });
         
         // Au chargement de la page
-        document.addEventListener('DOMContentLoaded', async () => {
-            await fetchAllCreators();
+        checkAuth();
+        
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            loadingDiv.style.display = 'none';
+            adminContent.style.display = 'block';
+            fetchAllCreators();
+        }
+        
+        // Déconnexion
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
         });
+        
+        // Ajout d'un créateur
+        addCreatorForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const pseudo = document.getElementById('pseudo').value;
+            const link = document.getElementById('link').value;
+            const rate = parseFloat(document.getElementById('rate').value);
+            
+            try {
+                const { error } = await supabase
+                    .from('affiliates_stats')
+                    .insert([{ 
+                        pseudo: pseudo, 
+                        rebrandly_link: link, 
+                        click_rate: rate,
+                        clicks: 0
+                    }]);
+                
+                if (error) throw error;
+                
+                showMessage('Créateur ajouté avec succès !', 'success');
+                addCreatorForm.reset();
+                fetchAllCreators();
+                
+            } catch (error) {
+                showMessage(`Erreur : ${error.message}`, 'error');
+            }
+        });
+        
+        function showMessage(message, type) {
+            messageDiv.innerHTML = `<div class="${type === 'success' ? 'success-message' : 'error'}">${message}</div>`;
+            setTimeout(() => messageDiv.innerHTML = '', 3000);
+        }
+        
+        window.deleteCreator = async function(pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer ${pseudo} ?`)) return;
+            
+            try {
+                // Supprimer d'abord les paiements associés
+                const { error: paymentsError } = await supabase
+                    .from('payments')
+                    .delete()
+                    .eq('pseudo', pseudo);
+                
+                if (paymentsError) throw paymentsError;
+                
+                // Puis supprimer le créateur
+                const { error } = await supabase
+                    .from('affiliates_stats')
+                    .delete()
+                    .eq('pseudo', pseudo);
+                
+                if (error) throw error;
+                
+                showMessage(`Créateur ${pseudo} supprimé avec succès !`, 'success');
+                fetchAllCreators();
+                
+            } catch (error) {
+                showMessage(`Erreur : ${error.message}`, 'error');
+            }
+        }
         
         async function fetchAllCreators() {
             try {
                 // Récupérer tous les créateurs
-                const creatorsResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/affiliates_stats?select=*`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+                const { data: creators, error: creatorsError } = await supabase
+                    .from('affiliates_stats')
+                    .select('*');
                 
-                const creators = await creatorsResponse.json();
+                if (creatorsError) throw creatorsError;
                 
                 // Récupérer tous les paiements
-                const paymentsResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/payments?select=pseudo,amount`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+                const { data: payments, error: paymentsError } = await supabase
+                    .from('payments')
+                    .select('pseudo,amount');
                 
-                const payments = await paymentsResponse.json();
+                if (paymentsError) throw paymentsError;
                 
                 // Calculer les totaux payés par créateur
                 const paidByCreator = {};
@@ -239,6 +421,7 @@
                         <a href="dashboard.html?ref=${creator.pseudo}" target="_blank">
                             <button class="view-button">Voir</button>
                         </a>
+                        <button class="delete-button" onclick="deleteCreator('${creator.pseudo}')">Supprimer</button>
                     </td>
                 `;
                 creatorsTableBody.appendChild(row);
