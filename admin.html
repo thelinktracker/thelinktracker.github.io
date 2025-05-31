@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Link Tracker - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styles spécifiques à la page admin */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .creators-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .creators-table th {
+            text-align: left;
+            padding: 1rem;
+        }
+        
+        .view-button {
+            padding: 0.4rem 0.8rem;
+            background: #0984e3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .view-button:hover {
+            background: #0773c5;
+        }
+        
+        .total-row td {
+            font-weight: bold;
+            border-top: 2px solid #ddd;
+            background: #f1f3f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="admin-header">
+            <h1>Dashboard Admin</h1>
+            <small>Vue d'ensemble de tous les créateurs</small>
+        </div>
+        
+        <div class="stats">
+            <div class="table-container">
+                <table id="creators" class="creators-table">
+                    <thead>
+                        <tr>
+                            <th>Pseudo</th>
+                            <th>Lien</th>
+                            <th>Commission/clic</th>
+                            <th>Clics</th>
+                            <th>Revenus</th>
+                            <th>Payé</th>
+                            <th>Reste à payer</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rempli dynamiquement -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="4">Total</td>
+                            <td id="totalRevenue">-</td>
+                            <td id="totalPaid">-</td>
+                            <td id="totalRemaining">-</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="update-info">
+                <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://hpjywzvwmtiikhntbbyt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwanl3enZ3bXRpaWtobnRiYnl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI1OTIsImV4cCI6MjA2NDI3ODU5Mn0.rogNUkmTWdOpK-UuxTG9q3Hj-mj89UKtBnQtALNrtX4';
+        
+        // Éléments DOM
+        const creatorsTableBody = document.querySelector('#creators tbody');
+        const totalRevenueEl = document.getElementById('totalRevenue');
+        const totalPaidEl = document.getElementById('totalPaid');
+        const totalRemainingEl = document.getElementById('totalRemaining');
+        const lastUpdateEl = document.getElementById('lastUpdate');
+        
+        // Formatage des nombres
+        const formatter = new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR'
+        });
+        
+        // Au chargement de la page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchAllCreators();
+        });
+        
+        async function fetchAllCreators() {
+            try {
+                // Récupérer tous les créateurs
+                const creatorsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/affiliates_stats?select=*`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                
+                const creators = await creatorsResponse.json();
+                
+                // Récupérer tous les paiements
+                const paymentsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/payments?select=pseudo,amount`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                
+                const payments = await paymentsResponse.json();
+                
+                // Calculer les totaux payés par créateur
+                const paidByCreator = {};
+                payments.forEach(payment => {
+                    if (!paidByCreator[payment.pseudo]) {
+                        paidByCreator[payment.pseudo] = 0;
+                    }
+                    paidByCreator[payment.pseudo] += payment.amount;
+                });
+                
+                // Afficher les données
+                displayCreators(creators, paidByCreator);
+                
+                // Mettre à jour la date
+                lastUpdateEl.textContent = new Date().toLocaleString('fr-FR');
+                
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données:', error);
+                creatorsTableBody.innerHTML = '<tr><td colspan="8">Erreur lors de la récupération des données</td></tr>';
+            }
+        }
+        
+        function displayCreators(creators, paidByCreator) {
+            // Vider le tableau
+            creatorsTableBody.innerHTML = '';
+            
+            // Calculer les totaux
+            let totalRevenue = 0;
+            let totalPaid = 0;
+            let totalRemaining = 0;
+            
+            // Trier les créateurs par montant restant à payer (décroissant)
+            creators.sort((a, b) => {
+                const revenueA = a.clicks * a.click_rate;
+                const revenueB = b.clicks * b.click_rate;
+                const paidA = paidByCreator[a.pseudo] || 0;
+                const paidB = paidByCreator[b.pseudo] || 0;
+                return (revenueB - paidB) - (revenueA - paidA);
+            });
+            
+            // Ajouter chaque créateur
+            creators.forEach(creator => {
+                const revenue = creator.clicks * creator.click_rate;
+                const paid = paidByCreator[creator.pseudo] || 0;
+                const remaining = revenue - paid;
+                
+                // Ajouter aux totaux
+                totalRevenue += revenue;
+                totalPaid += paid;
+                totalRemaining += remaining;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${creator.pseudo}</td>
+                    <td><a href="${creator.rebrandly_link}" target="_blank">${creator.rebrandly_link}</a></td>
+                    <td>${formatter.format(creator.click_rate)}</td>
+                    <td>${creator.clicks.toLocaleString('fr-FR')}</td>
+                    <td>${formatter.format(revenue)}</td>
+                    <td>${formatter.format(paid)}</td>
+                    <td>${formatter.format(remaining)}</td>
+                    <td>
+                        <a href="dashboard.html?ref=${creator.pseudo}" target="_blank">
+                            <button class="view-button">Voir</button>
+                        </a>
+                    </td>
+                `;
+                creatorsTableBody.appendChild(row);
+            });
+            
+            // Mettre à jour les totaux
+            totalRevenueEl.textContent = formatter.format(totalRevenue);
+            totalPaidEl.textContent = formatter.format(totalPaid);
+            totalRemainingEl.textContent = formatter.format(totalRemaining);
+        }
+    </script>
+</body>
+</html> 
