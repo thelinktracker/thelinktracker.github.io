@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Affiliation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="error" class="error hidden"></div>
+        
+        <div id="stats" class="stats hidden">
+            <h1>Vos statistiques</h1>
+            
+            <div class="stat-card">
+                <h2>Clics</h2>
+                <p id="clicks">-</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>Revenu estimé</h2>
+                <p id="revenue">-</p>
+            </div>
+
+            <div class="update-info">
+                <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 
