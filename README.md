@@ -44,16 +44,15 @@ https://thelinktracker.github.io/dashboard.html?ref=test
 ## 📂 Structure du projet
 
 ```
-/docs                     # Site GitHub Pages
-  ├── index.html          # Redirection vers dashboard
-  ├── dashboard.html      # Page principale
-  ├── style.css           # Styles CSS
-  ├── app.js              # Logique JavaScript
-  └── README.md           # Documentation
-
-ACTION_PLAN.md            # Plan d'action global
-TASKS.md                  # Liste des tâches
-make_scenario.json        # Configuration Make.com
+/                         # Racine (GitHub Pages)
+├── index.html            # Redirection vers dashboard
+├── dashboard.html        # Page principale
+├── style.css             # Styles CSS
+├── app.js                # Logique JavaScript
+├── .nojekyll             # Configuration GitHub Pages
+├── ACTION_PLAN.md        # Plan d'action global
+├── TASKS.md              # Liste des tâches
+└── make_scenario.json    # Configuration Make.com
 ```
 
 ## ⚙️ Configuration Make.com
