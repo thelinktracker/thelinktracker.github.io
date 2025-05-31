@@ -241,6 +241,18 @@
         
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // Fonction pour échapper les caractères HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
         // Éléments DOM
         const loadingDiv = document.getElementById('loading');
         const adminContent = document.getElementById('adminContent');
@@ -305,7 +317,7 @@
                 fetchAllCreators();
                 
             } catch (error) {
-                showMessage(`Erreur : ${error.message}`, 'error');
+                showMessage(`Erreur : ${escapeHtml(error.message)}`, 'error');
             }
         });
         
@@ -334,11 +346,11 @@
                 
                 if (error) throw error;
                 
-                showMessage(`Créateur ${pseudo} supprimé avec succès !`, 'success');
+                showMessage(`Créateur ${escapeHtml(pseudo)} supprimé avec succès !`, 'success');
                 fetchAllCreators();
                 
             } catch (error) {
-                showMessage(`Erreur : ${error.message}`, 'error');
+                showMessage(`Erreur : ${escapeHtml(error.message)}`, 'error');
             }
         }
         
@@ -409,21 +421,45 @@
                 totalRemaining += remaining;
                 
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${creator.pseudo}</td>
-                    <td><a href="${creator.rebrandly_link}" target="_blank" title="${creator.rebrandly_link}">${creator.rebrandly_link}</a></td>
-                    <td>${formatter.format(creator.click_rate)}</td>
-                    <td>${creator.clicks.toLocaleString('fr-FR')}</td>
-                    <td>${formatter.format(revenue)}</td>
-                    <td>${formatter.format(paid)}</td>
-                    <td>${formatter.format(remaining)}</td>
-                    <td>
-                        <a href="dashboard.html?ref=${creator.pseudo}" target="_blank">
-                            <button class="view-button">Voir</button>
-                        </a>
-                        <button class="delete-button" onclick="deleteCreator('${creator.pseudo}')">Supprimer</button>
-                    </td>
-                `;
+                
+                // Création sécurisée des cellules
+                const cells = [
+                    escapeHtml(creator.pseudo),
+                    `<a href="${escapeHtml(creator.rebrandly_link)}" target="_blank" title="${escapeHtml(creator.rebrandly_link)}">${escapeHtml(creator.rebrandly_link)}</a>`,
+                    formatter.format(creator.click_rate),
+                    creator.clicks.toLocaleString('fr-FR'),
+                    formatter.format(revenue),
+                    formatter.format(paid),
+                    formatter.format(remaining)
+                ];
+                
+                cells.forEach(content => {
+                    const td = document.createElement('td');
+                    td.innerHTML = content;
+                    row.appendChild(td);
+                });
+                
+                // Cellule actions créée de manière sécurisée
+                const actionsCell = document.createElement('td');
+                
+                const viewLink = document.createElement('a');
+                viewLink.href = `dashboard.html?ref=${encodeURIComponent(creator.pseudo)}`;
+                viewLink.target = '_blank';
+                
+                const viewButton = document.createElement('button');
+                viewButton.className = 'view-button';
+                viewButton.textContent = 'Voir';
+                viewLink.appendChild(viewButton);
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.onclick = () => deleteCreator(creator.pseudo);
+                
+                actionsCell.appendChild(viewLink);
+                actionsCell.appendChild(deleteButton);
+                row.appendChild(actionsCell);
+                
                 creatorsTableBody.appendChild(row);
             });
             

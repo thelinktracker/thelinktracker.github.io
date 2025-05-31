@@ -2,6 +2,19 @@
 const SUPABASE_URL = 'https://hpjywzvwmtiikhntbbyt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwanl3enZ3bXRpaWtobnRiYnl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI1OTIsImV4cCI6MjA2NDI3ODU5Mn0.rogNUkmTWdOpK-UuxTG9q3Hj-mj89UKtBnQtALNrtX4';
 
+// Fonction pour échapper les caractères HTML
+function escapeHtml(text) {
+    if (text == null) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 // Éléments DOM
 const errorDiv = document.getElementById('error');
 const statsDiv = document.getElementById('stats');
@@ -149,14 +162,22 @@ function displayPayments(payments) {
         row.innerHTML = '<td colspan="3" style="text-align: center;">Aucun paiement enregistré</td>';
         paymentsTableBody.appendChild(row);
     } else {
-        // Ajouter chaque paiement
+        // Ajouter chaque paiement de manière sécurisée
         payments.forEach(payment => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${dateFormatter.format(new Date(payment.date))}</td>
-                <td>${formatter.format(payment.amount)}</td>
-                <td>${payment.comment || '-'}</td>
-            `;
+            
+            const dateCell = document.createElement('td');
+            dateCell.textContent = dateFormatter.format(new Date(payment.date));
+            row.appendChild(dateCell);
+            
+            const amountCell = document.createElement('td');
+            amountCell.textContent = formatter.format(payment.amount);
+            row.appendChild(amountCell);
+            
+            const commentCell = document.createElement('td');
+            commentCell.textContent = payment.comment || '-';
+            row.appendChild(commentCell);
+            
             paymentsTableBody.appendChild(row);
         });
     }
