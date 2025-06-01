@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,14 +33,14 @@
                 <div class="creator-header">
                     <h1 id="creatorName">-</h1>
                     <div class="link-info">
-                        <span class="label">Votre lien :</span>
+                        <span class="label">Your link:</span>
                         <div class="link-container">
                             <code id="creatorLink">-</code>
-                            <button id="copyLink" class="copy-button">Copier</button>
+                            <button id="copyLink" class="copy-button">Copy</button>
                         </div>
                     </div>
                     <div class="rate-info">
-                        <span class="label">Commission par clic :</span>
+                        <span class="label">Commission per click:</span>
                         <code id="clickRate">-</code>
                     </div>
                 </div>
@@ -48,35 +48,37 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h2>Clics</h2>
+                    <h2>Clicks</h2>
                     <p id="clicks">-</p>
+                    <small>Total clicks</small>
                 </div>
 
                 <div class="stat-card">
-                    <h2>Revenu estimé</h2>
+                    <h2>Estimated revenue</h2>
                     <p id="revenue">-</p>
+                    <small>Total revenue - Payments made</small>
                 </div>
 
                 <div class="stat-card highlight">
-                    <h2>Reste à payer</h2>
+                    <h2>Remaining to pay</h2>
                     <p id="remaining">-</p>
-                    <small>Revenu total - Paiements effectués</small>
+                    <small>Send your invoice to money@thepunchlines.app</small>
                 </div>
             </div>
 
             <div class="update-info">
-                <small>Dernière mise à jour : <span id="lastUpdate">-</span></small>
+                <small>Last update: <span id="lastUpdate">-</span></small>
             </div>
 
             <div class="payments-section">
-                <h2>Historique des paiements</h2>
+                <h2>Payment history</h2>
                 <div class="table-container">
                     <table id="payments">
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Montant</th>
-                                <th>Commentaire</th>
+                                <th>Amount</th>
+                                <th>Comment</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -84,7 +86,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td><strong>Total payé</strong></td>
+                                <td><strong>Total paid</strong></td>
                                 <td id="totalPaid">-</td>
                                 <td></td>
                             </tr>
@@ -95,6 +97,6 @@
         </div>
     </div>
     <a href="login.html" class="admin-link">Admin</a>
-    <script src="app.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html> 
