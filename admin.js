@@ -285,7 +285,7 @@ function displayCreators(creators, paidByCreator) {
         const actionsCell = document.createElement('td');
         
         const viewLink = document.createElement('a');
-        viewLink.href = `dashboard.html?ref=${encodeURIComponent(creator.pseudo)}`;
+        viewLink.href = `for/?name=${encodeURIComponent(creator.pseudo)}`;
         viewLink.target = '_blank';
         
         const viewButton = document.createElement('button');
