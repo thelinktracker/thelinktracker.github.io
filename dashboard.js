@@ -59,7 +59,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get('ref');
 
 if (!ref) {
-    showError('Aucun identifiant créateur spécifié');
+    showError('No creator identifier specified');
 } else {
     fetchStats(ref);
     fetchPayments(ref);
@@ -80,7 +80,7 @@ async function fetchStats(pseudo) {
         const data = await response.json();
 
         if (!data.length) {
-            showError('Créateur non trouvé');
+            showError('Creator not found');
             return;
         }
 
@@ -88,8 +88,8 @@ async function fetchStats(pseudo) {
         displayStats(stats);
 
     } catch (error) {
-        showError('Erreur lors de la récupération des données');
-        console.error('Erreur:', error);
+        showError('Error retrieving data');
+        console.error('Error:', error);
     }
 }
 
@@ -109,13 +109,13 @@ async function fetchPayments(pseudo) {
         displayPayments(payments);
 
     } catch (error) {
-        console.error('Erreur lors de la récupération des paiements:', error);
+        console.error('Error fetching payments:', error);
     }
 }
 
 function displayStats(stats) {
     // Affichage des informations du créateur
-    creatorNameEl.textContent = `Dashboard de ${stats.pseudo}`;
+    creatorNameEl.textContent = `Dashboard of ${stats.pseudo}`;
     creatorLinkEl.textContent = stats.rebrandly_link;
     clickRateEl.textContent = percentFormatter.format(stats.click_rate);
 
@@ -124,14 +124,14 @@ function displayStats(stats) {
         navigator.clipboard.writeText(stats.rebrandly_link)
             .then(() => {
                 const originalText = copyLinkBtn.textContent;
-                copyLinkBtn.textContent = 'Copié !';
+                copyLinkBtn.textContent = 'Copied!';
                 copyLinkBtn.style.background = '#00b894';
                 setTimeout(() => {
                     copyLinkBtn.textContent = originalText;
                     copyLinkBtn.style.background = '';
                 }, 2000);
             })
-            .catch(err => console.error('Erreur lors de la copie:', err));
+            .catch(err => console.error('Error copying link:', err));
     });
 
     // Calcul du revenu estimé
@@ -159,7 +159,7 @@ function displayPayments(payments) {
 
     if (payments.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="3" style="text-align: center;">Aucun paiement enregistré</td>';
+        row.innerHTML = '<td colspan="3" style="text-align: center;">No payments recorded</td>';
         paymentsTableBody.appendChild(row);
     } else {
         // Ajouter chaque paiement de manière sécurisée
