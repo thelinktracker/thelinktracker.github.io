@@ -60,7 +60,7 @@
             font-size: 0.9rem;
         }
         
-        .form-group input {
+        .form-group input, .form-group textarea {
             padding: 0.5rem;
             border: 1px solid #e9ecef;
             border-radius: 4px;
@@ -95,6 +95,22 @@
             background: #c0392b;
         }
         
+        .pay-button {
+            padding: 0.3rem 0.6rem;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+            margin-left: 0.5rem;
+        }
+        
+        .pay-button:hover {
+            background: #00a383;
+        }
+        
         .creators-table {
             width: 100%;
             margin-top: 1rem;
@@ -114,10 +130,10 @@
         .creators-table th:nth-child(2), .creators-table td:nth-child(2) { width: 20%; } /* Lien */
         .creators-table th:nth-child(3), .creators-table td:nth-child(3) { width: 10%; } /* Commission */
         .creators-table th:nth-child(4), .creators-table td:nth-child(4) { width: 8%; } /* Clics */
-        .creators-table th:nth-child(5), .creators-table td:nth-child(5) { width: 12%; } /* Revenus */
-        .creators-table th:nth-child(6), .creators-table td:nth-child(6) { width: 12%; } /* Payé */
-        .creators-table th:nth-child(7), .creators-table td:nth-child(7) { width: 12%; } /* Reste à payer */
-        .creators-table th:nth-child(8), .creators-table td:nth-child(8) { width: 16%; } /* Actions */
+        .creators-table th:nth-child(5), .creators-table td:nth-child(5) { width: 10%; } /* Revenus */
+        .creators-table th:nth-child(6), .creators-table td:nth-child(6) { width: 10%; } /* Payé */
+        .creators-table th:nth-child(7), .creators-table td:nth-child(7) { width: 10%; } /* Reste à payer */
+        .creators-table th:nth-child(8), .creators-table td:nth-child(8) { width: 22%; } /* Actions */
         
         .table-container {
             overflow-x: auto;
@@ -152,6 +168,74 @@
             text-align: center;
             padding: 2rem;
             color: #636e72;
+        }
+        
+        /* Styles pour le modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+        
+        .modal h2 {
+            margin-bottom: 1.5rem;
+            color: #2d3436;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .cancel-button {
+            padding: 0.8rem 1.5rem;
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .cancel-button:hover {
+            background: #dee2e6;
         }
         
         @media (max-width: 1200px) {
@@ -232,6 +316,31 @@
         </div>
     </div>
     
+    <!-- Modal de paiement -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enregistrer un paiement</h2>
+            <p>Paiement pour : <strong id="paymentCreatorName">-</strong></p>
+            <p>Montant restant à payer : <strong id="paymentRemaining">-</strong></p>
+            
+            <form id="paymentForm" class="modal-form">
+                <div class="form-group">
+                    <label for="paymentAmount">Montant (€)</label>
+                    <input type="number" id="paymentAmount" step="0.01" min="0.01" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="paymentComment">Commentaire (optionnel)</label>
+                    <textarea id="paymentComment" rows="3" placeholder="Ex: Paiement de février 2025"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="add-button">Enregistrer le paiement</button>
+                    <button type="button" class="cancel-button" id="cancelPayment">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
@@ -265,6 +374,16 @@
         const totalRemainingEl = document.getElementById('totalRemaining');
         const lastUpdateEl = document.getElementById('lastUpdate');
         
+        // Modal elements
+        const modal = document.getElementById('paymentModal');
+        const closeModal = document.querySelector('.close');
+        const cancelPaymentBtn = document.getElementById('cancelPayment');
+        const paymentForm = document.getElementById('paymentForm');
+        const paymentCreatorNameEl = document.getElementById('paymentCreatorName');
+        const paymentRemainingEl = document.getElementById('paymentRemaining');
+        let currentPaymentCreator = null;
+        let currentRemaining = 0;
+        
         // Formatage des nombres
         const formatter = new Intl.NumberFormat('fr-FR', {
             style: 'currency',
@@ -290,6 +409,73 @@
         logoutBtn.addEventListener('click', async () => {
             await supabase.auth.signOut();
             window.location.href = 'login.html';
+        });
+        
+        // Modal handling
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+            paymentForm.reset();
+        });
+        
+        cancelPaymentBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            paymentForm.reset();
+        });
+        
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+                paymentForm.reset();
+            }
+        };
+        
+        // Open payment modal
+        window.openPaymentModal = function(pseudo, remaining) {
+            currentPaymentCreator = pseudo;
+            currentRemaining = remaining;
+            paymentCreatorNameEl.textContent = pseudo;
+            paymentRemainingEl.textContent = formatter.format(remaining);
+            
+            // Set max amount to remaining
+            const amountInput = document.getElementById('paymentAmount');
+            amountInput.max = remaining;
+            amountInput.value = remaining.toFixed(2);
+            
+            modal.style.display = 'block';
+        }
+        
+        // Handle payment submission
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const comment = document.getElementById('paymentComment').value;
+            
+            if (amount > currentRemaining) {
+                showMessage(`Le montant ne peut pas dépasser ${formatter.format(currentRemaining)}`, 'error');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('payments')
+                    .insert([{
+                        pseudo: currentPaymentCreator,
+                        amount: amount,
+                        comment: comment || null,
+                        date: new Date().toISOString().split('T')[0]
+                    }]);
+                
+                if (error) throw error;
+                
+                showMessage(`Paiement de ${formatter.format(amount)} enregistré pour ${escapeHtml(currentPaymentCreator)}`, 'success');
+                modal.style.display = 'none';
+                paymentForm.reset();
+                fetchAllCreators();
+                
+            } catch (error) {
+                showMessage(`Erreur : ${escapeHtml(error.message)}`, 'error');
+            }
         });
         
         // Ajout d'un créateur
@@ -451,12 +637,23 @@
                 viewButton.textContent = 'Voir';
                 viewLink.appendChild(viewButton);
                 
+                const payButton = document.createElement('button');
+                payButton.className = 'pay-button';
+                payButton.textContent = 'Payer';
+                payButton.onclick = () => openPaymentModal(creator.pseudo, remaining);
+                payButton.disabled = remaining <= 0;
+                if (remaining <= 0) {
+                    payButton.style.opacity = '0.5';
+                    payButton.style.cursor = 'not-allowed';
+                }
+                
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-button';
                 deleteButton.textContent = 'Supprimer';
                 deleteButton.onclick = () => deleteCreator(creator.pseudo);
                 
                 actionsCell.appendChild(viewLink);
+                actionsCell.appendChild(payButton);
                 actionsCell.appendChild(deleteButton);
                 row.appendChild(actionsCell);
                 
